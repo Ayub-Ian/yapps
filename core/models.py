@@ -5,6 +5,7 @@ from django.db import models
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
-    
-    # Other restaurant fields...
+    image_url = models.URLField(blank=True, null=True)
+    description = models.TextField()
 
+    # Other restaurant fields...

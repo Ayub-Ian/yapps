@@ -5,7 +5,7 @@ from core.models import Restaurant
 class MenuItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
-        fields = ['id', 'name', 'description', 'price']
+        fields = ['id', 'name', 'description', 'price', 'image_url']
 
 class CategorySerializer(serializers.ModelSerializer):
     items = MenuItemSerializer(many=True, read_only=True)
@@ -19,11 +19,11 @@ class MenuSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Menu
-        fields = ['id', 'name', 'categories']
+        fields = ['id', 'name', 'categories', 'image_url']
 
 class RestaurantSerializer(serializers.ModelSerializer):
     menus = MenuSerializer(many=True, read_only=True)
 
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'menus']
+        fields = ['id', 'name', 'description', 'image_url', 'description']

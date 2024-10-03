@@ -6,12 +6,13 @@ class Menu(models.Model):
     restaurant = models.ForeignKey(Restaurant, related_name='menus', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     active_status = models.BooleanField(default=True)
-    
+    image_url = models.URLField(null=True, blank=True)
+
 class Category(models.Model):
     name = models.CharField(max_length=100)
     menu = models.ForeignKey(Menu, related_name='categories', on_delete=models.CASCADE)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 class MenuItem(models.Model):
@@ -20,6 +21,5 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(Category, related_name='items', on_delete=models.CASCADE)
     availability_status = models.BooleanField(default=True)
+    image_url = models.URLField(null=True, blank=True)
     external_id = models.IntegerField(null=True)  # Link to POS system item ID
-
-
