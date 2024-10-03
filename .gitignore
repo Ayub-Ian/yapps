@@ -17,3 +17,4 @@ env/
 # IDE configurations
 .idea/
 .vscode/
+pyrightconfig.json
