@@ -38,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
+    'rest_framework',
+    'django_filters',
+    'rest_framework_simplejwt',
     'core.apps.CoreConfig',
     'menu.apps.MenuConfig',
     'orders.apps.OrdersConfig',
@@ -47,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -129,3 +134,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTH_USER_MODEL = 'core.AppUser'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ]
+}
+
+CORS_ALLOWED_ORIGINS = [
+    "https://cors-test.codehappy.dev",
+    "http://localhost:3000"
+]
+
+# CSRF_TRUSTED_ORIGINS = [
+#     'www.safesite.com',
+# ]
+
+CORS_ALLOW_CREDENTIALS = True
+
