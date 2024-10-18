@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import QRCodeViewSet
+from .views import QRCodeViewSet, RestaurantViewSet
 from core.authentication.views import CustomTokenPairView, StaffRegisterView
 
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 router = DefaultRouter()
 router.register(r'qrcode', QRCodeViewSet, basename='qrcode')
+router.register(r'restaurant', RestaurantViewSet, basename='restaurant')
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -1,7 +1,8 @@
 from django.db import models
 import base64
-from django.core.files.base import ContentFile
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
+
 
 
 from django.conf import settings
@@ -25,6 +26,15 @@ class AppUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+ 
+    def create_staff_user(self, email, password=None, **extra_fields):
+        """Create and return a staff user with an email and password."""
+        extra_fields.setdefault('is_staff', True)
+
+        if extra_fields.get('is_superuser'):
+            raise ValueError('Staff users cannot be superusers.')
+        
+        return self.create_user(email, password, **extra_fields)
     
     def create_superuser(self, email, password=None, **extra_fields):
         """Create and return a superuser with an email and password."""
@@ -99,9 +109,8 @@ class Restaurant(models.Model):
         
         
 class Currency(models.Model):
-    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name="currencies")
     code = models.CharField(max_length=3,
-                            primary_key=True,
                             choices=[(i.alpha_3, i.alpha_3) for i in pycountry.currencies])
     rate = models.DecimalField(default=1, max_digits=12, decimal_places=6)
     is_default = models.BooleanField(default=False)

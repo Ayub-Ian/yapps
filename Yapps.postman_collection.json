@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "587a6150-275c-4a11-8f62-9bbef70c1472",
+		"name": "Yapps",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34616610"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Assuming the access code is in the JSON response body",
+									"const responseJson = pm.response.json();",
+									"",
+									"// Replace 'access_code' with the actual key in your response",
+									"const accessCode = responseJson.access;",
+									"",
+									"// Store the access code in an environment variable",
+									"pm.collectionVariables.set(\"access_code\", accessCode);",
+									"",
+									"// Log the access code to the console for verification",
+									"console.log(\"Access Code: \", accessCode);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "admin@admin.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{backendUrl}}/api/login/",
+							"host": [
+								"{{backendUrl}}"
+							],
+							"path": [
+								"api",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "register",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "restaurant",
+			"item": [
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "backendUrl",
+			"value": "http://localhost:8000"
+		},
+		{
+			"key": "backendUrl",
+			"value": ""
+		},
+		{
+			"key": "access_code",
+			"value": ""
+		}
+	]
+}

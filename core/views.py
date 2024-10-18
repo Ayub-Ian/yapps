@@ -3,8 +3,10 @@ import qrcode
 import os
 from django.conf import settings
 from rest_framework import viewsets
-from .models import QRCode
-from .serializers import QRCodeSerializer
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from .permissions import IsSuperUserOrReadOnly
+from .models import QRCode, Restaurant
+from .serializers import QRCodeSerializer, RestaurantSerializer
 
 def generate_qr_code(qr_code_data, qr_code_id):
     """Generate a QR code image and save it to the media directory."""
@@ -45,3 +47,12 @@ class QRCodeViewSet(viewsets.ModelViewSet):
         qr_image_path = generate_qr_code(qr_data, qr_code_instance.id)
        
         # qr_code_instance.save(update_fields=['url'])
+        
+class RestaurantViewSet(viewsets.ModelViewSet):
+    
+    serializer_class = RestaurantSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+    
+    
+    def get_queryset(self):
+        return Restaurant.objects.all()
