@@ -9,13 +9,14 @@ from django.contrib.auth.password_validation import validate_password
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
-    @classmethod
-    def get_token(cls, user):
-        token = super(MyTokenObtainPairSerializer, cls).get_token(user)
+    def validate(self, attrs):
+        data = super().validate(attrs)
 
-        # Add custom claims
-        token['email'] = user.email
-        return token
+        
+        data['user'] = {"email" : self.user.email, "id": self.user.id, "firstname": self.user.first_name}
+        return data
+
+
 
 
 class RegisterSerializer(serializers.ModelSerializer):

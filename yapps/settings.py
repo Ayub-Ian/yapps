@@ -164,6 +164,12 @@ REST_FRAMEWORK = {
     },
 }
 
+SIMPLE_JWT = {
+    
+    "USER_ID_FIELD" : "email",
+    "TOKEN_OBTAIN_SERIALIZER": "core.authentication.serializers.MyTokenObtainPairSerializer",
+}
+
 CORS_ALLOWED_ORIGINS = [
     "https://cors-test.codehappy.dev",
     "http://localhost:3000"
