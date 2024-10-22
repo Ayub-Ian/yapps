@@ -5,11 +5,10 @@ import { useFormState } from "react-dom";
 import { SubmitButton } from "@/modules/common/components/submit-button";
 import { Input } from "@/modules/common/components/ui/input";
 
-import { logCustomerIn } from "@/modules/account/actions";
-// import ErrorMessage from "@modules/checkout/components/error-message"
+import { authenticate } from "@/modules/account/actions";
 
 const Login = () => {
-  const [message, formAction] = useFormState(logCustomerIn, null);
+  const [message, formAction] = useFormState(authenticate, null);
 
   return (
     <div
@@ -49,6 +48,7 @@ const Login = () => {
           </label>
         </div>
         {/* <ErrorMessage error={message} data-testid="login-error-message" /> */}
+        {message && <p>{message}</p>}{" "}
         <SubmitButton
           data-testid="sign-in-button"
           className="w-full mt-6 bg-primary text-white font-medium rounded-xl"

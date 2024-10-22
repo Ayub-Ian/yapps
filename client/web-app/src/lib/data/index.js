@@ -1,8 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
+import { API_SERVER_BASE_URL } from "../config";
+import { cookies } from "next/headers";
 
-async function useAuthenticate(credentials, customHeaders = null) {
-  return useMutation(async (credentials) => {
-    const res = await fetch("/api/login", {
+async function authenticate(credentials, customHeaders = null) {
+  
+    const res = await fetch(`${API_SERVER_BASE_URL}/api/login/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -16,16 +17,15 @@ async function useAuthenticate(credentials, customHeaders = null) {
     }
 
     const data = await res.json();
-    return data.jwt_token; // Assuming API returns a JWT token
-  });
+
+    return data
+
 }
+
+
+
 export async function getToken(credentials) {
-  return medusaClient.auth
-    .getToken(credentials, {
-      next: {
-        tags: ["auth"],
-      },
-    })
+  return authenticate(credentials)  
     .then(({ access }) => {
       access &&
         cookies().set("_yapps_jwt", access, {

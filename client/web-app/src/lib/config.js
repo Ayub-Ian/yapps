@@ -4,10 +4,10 @@ import {
   isServer,
 } from "@tanstack/react-query";
 
-let YAPPS_BACKEND_URL = "http://localhost:8000";
+export let API_SERVER_BASE_URL = "http://localhost:8000";
 
-if (process.env.NEXT_PUBLIC_YAPPS_BACKEND_URL) {
-  YAPPS_BACKEND_URL = process.env.NEXT_PUBLIC_YAPPS_BACKEND_URL;
+if (process.env.NEXT_PUBLIC_API_SERVER_BASE_URL) {
+  API_SERVER_BASE_URL = process.env.NEXT_PUBLIC_API_SERVER_BASE_URL;
 }
 
 function makeQueryClient() {
@@ -44,17 +44,21 @@ export function getQueryClient() {
 
 export const authConfig = {
   pages: {
-    signIn: "/admin/accounts",
+    signIn: "/staff/login",
   },
+  session: {
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 1 Day
+   },
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnAdmin = nextUrl.pathname.startsWith("/admin");
+      const isOnAdmin = nextUrl.pathname.startsWith("/staff");
       if (isOnAdmin) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
-        return Response.redirect(new URL("/admin/accounts", nextUrl));
+        return Response.redirect(new URL("/staff", nextUrl));
       }
       return true;
     },

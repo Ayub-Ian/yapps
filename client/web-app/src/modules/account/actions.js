@@ -1,30 +1,43 @@
 "use server";
 
-// import { getToken } from "@lib/data";
+import { signIn } from "@/lib/auth";
+import { AuthError } from "next-auth";
 import { revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
-import { cookies, headers } from "next/headers";
+import { z } from "zod";
 
 export async function authenticate(_currentState, formData) {
-  const email = formData.get("email");
-  const password = formData.get("password");
+ 
+  const validatedFields = z
+    .object({
+      email: z
+        .string({
+          invalid_type_error: "Invalid Email",
+        })
+        .email(),
+    })
+    .safeParse({
+      email: formData.get("email"),
+    });
+
+  // Return early if the form data is invalid
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
 
   try {
-    // await getToken({ email, password }).then(() => {
-    //   revalidateTag("customer")
-    // })
-    await signStaffIn('credentials', formData)
+    await signIn("credentials", formData);
+    revalidateTag("auth")
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
+        case "CredentialsSignin":
+          return "Invalid credentials.";
         default:
-          return 'Something went wrong.';
+          return "Something went wrong.";
       }
     }
     throw error;
-  }
-
   }
 }
