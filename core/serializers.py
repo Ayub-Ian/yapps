@@ -50,3 +50,15 @@ class RestaurantSerializer(serializers.ModelSerializer):
             UserToRestaurant.objects.create(user=user, restaurant=restaurant)
 
         return restaurant
+    
+# class RestaurantBriefSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Restaurant
+#         fields = (
+#             'id', 'name', 'first_name', 'last_name', 'company', 'city', 'country', 'state', 'date_created', 'currency',
+#             'phone', 'country_name', 'long_name', 'vat_id', 'status', 'address1', 'zip_code', 'roles', 'display',
+#             'enough_credit',
+#         )
+#         read_only_fields = (
+#             'id', 'name', 'country_name', 'long_name', 'currency', 'status', 'display', 'enough_credit',
+#         )

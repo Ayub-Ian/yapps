@@ -2,6 +2,10 @@ from django.db import models
 import base64
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from django.http import HttpRequest
+from rest_framework.request import Request
+
+from typing import Optional
 
 
 
@@ -72,6 +76,70 @@ class AppUser(AbstractUser):
     
     
     objects = AppUserManager()
+    
+    @property
+    def managed_restaurants(self):
+        excluded_clients_ids = UserToRestaurant.objects.filter(user=self).values_list(
+            'restaurant__id', flat=True,
+        )
+        return self.restaurants.exclude(id__in=excluded_clients_ids).order_by('usertorestaurant')
+
+    
+
+
+    def get_active_restaurant(self, request) -> Optional['Restaurant']:
+        if request:
+            if not self.is_staff:
+                return None
+            if request.user.is_anonymous or not request.user.is_staff:
+                # method is called from an admin user for a regular user, or by anonymous user,
+                # we do not have active client information here
+                return None
+
+            active_restaurant_id = None
+            # attempt to retrieve active client based on request parameters
+            if isinstance(request, Request):
+                active_restaurant_id = request.query_params.get('active_restaurant')
+            elif isinstance(request, HttpRequest):
+                active_restaurant_id = request.GET.get('active_restaurant')
+
+            if active_restaurant_id:
+                active_restaurant = self.managed_restaurants.filter(id=active_restaurant_id).first()
+                if active_restaurant:
+                    if active_restaurant_id != request.session.get('active_restaurant_id'):
+                        # save active client id in session if not already present
+                        request.session['active_restaurant_id'] = active_restaurant_id
+                        # reset permission cache since client might have changed
+                        # active_client_changed.send(sender=self.__class__, user=self)
+                    return active_restaurant
+
+            active_restaurant_id = request.session.get('active_restaurant_id')
+            active_restaurant = self.managed_restaurants.filter(id=active_restaurant_id).first()
+            if active_restaurant:
+                return active_restaurant
+            # LOG.info('Active client not found from request, returning first client for user {}'.format(self.display))
+        else:
+            pass
+            # LOG.warning('No request provided, returning first client for user {}'.format(self.display))
+        active_restaurant = self.managed_restaurants.first()
+        if request and active_restaurant:
+            request.session['active_restaurant_id'] = active_restaurant.id
+        return active_restaurant
+
+    def get_full_name(self):
+        """Returns the first_name plus the last_name, with a space in between."""
+        if self.first_name and self.last_name:
+            return '{} {}'.format(self.first_name, self.last_name)
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
+        else:
+            return None
+
+    def get_short_name(self):
+        """Returns the short name for the user."""
+        return self.first_name
 
 
 class CurrencyManager(models.Manager):

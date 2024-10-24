@@ -2,8 +2,13 @@
 import qrcode
 import os
 from django.conf import settings
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.decorators import api_view
+from rest_framework.decorators import permission_classes
+from rest_framework.decorators import throttle_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from .permissions import IsSuperUserOrReadOnly
 from .models import QRCode, Restaurant
 from .serializers import QRCodeSerializer, RestaurantSerializer
@@ -50,9 +55,43 @@ class QRCodeViewSet(viewsets.ModelViewSet):
         
 class RestaurantViewSet(viewsets.ModelViewSet):
     
+    
     serializer_class = RestaurantSerializer
     permission_classes = [IsSuperUserOrReadOnly]
     
     
     def get_queryset(self):
         return Restaurant.objects.all()
+    
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def current_user(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        response_data = {
+            'user': get_current_user_info(request)
+        }
+        return Response(response_data)
+    
+    return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+def get_current_user_info(request):
+    user = request.user
+    restaurants = RestaurantSerializer(user.managed_restaurants.all(), many=True)
+    active_restaurant = user.get_active_restaurant(request=request)
+
+
+    return {
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'full_name': user.get_full_name(),
+        'email': user.email,
+        'restaurants': restaurants.data,
+        'active_restaurant': active_restaurant.id if active_restaurant else None,
+
+    }
